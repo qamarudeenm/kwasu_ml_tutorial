@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance Predictor</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            color: var(--text);
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border);
+        }
+
+        #result {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .result-score {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .result-grade {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Performance Predictor</h1>
+        
+        <div class="form-group">
+            <label for="studyHours">Weekly Self Study Hours</label>
+            <input type="number" id="studyHours" placeholder="e.g. 20" min="0" step="0.1">
+        </div>
+
+        <div class="form-group">
+            <label for="attendance">Attendance Percentage</label>
+            <input type="number" id="attendance" placeholder="e.g. 90" min="0" max="100" step="0.1">
+        </div>
+
+        <div class="form-group">
+            <label for="participation">Class Participation (0-10)</label>
+            <input type="number" id="participation" placeholder="e.g. 8" min="0" max="10" step="0.1">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-secondary" onclick="predict('score')">Predict Score</button>
+            <button class="btn-primary" onclick="predict('grade')">Predict Grade</button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function predict(type) {
+            const studyHours = document.getElementById('studyHours').value;
+            const attendance = document.getElementById('attendance').value;
+            const participation = document.getElementById('participation').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!studyHours || !attendance || !participation) {
+                showResult('Please fill in all fields', 'error');
+                return;
+            }
+
+            const data = {
+                weekly_self_study_hours: parseFloat(studyHours),
+                attendance_percentage: parseFloat(attendance),
+                class_participation: parseFloat(participation)
+            };
+
+            try {
+                const endpoint = type === 'score' ? '/predict/score' : '/predict/grade';
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (type === 'score') {
+                    showResult(`Predicted Total Score: ${result.predicted_total_score.toFixed(2)}`, 'score');
+                } else {
+                    showResult(`Predicted Grade: ${result.predicted_grade}`, 'grade');
+                }
+            } catch (error) {
+                showResult('Error making prediction', 'error');
+                console.error(error);
+            }
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+            
+            resultDiv.className = ''; // Reset classes
+            if (type === 'score') resultDiv.classList.add('result-score');
+            if (type === 'grade') resultDiv.classList.add('result-grade');
+            if (type === 'error') {
+                resultDiv.style.color = '#f87171';
+                resultDiv.style.backgroundColor = 'rgba(248, 113, 113, 0.1)';
+                resultDiv.style.border = '1px solid rgba(248, 113, 113, 0.2)';
+            }
+        }
+    </script>
+</body>
+</html>
