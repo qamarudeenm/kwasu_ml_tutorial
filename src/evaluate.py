@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, classification_report
+from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, classification_report, confusion_matrix
 import joblib
 import os
 
@@ -32,6 +32,9 @@ def evaluate_models():
     print(f"Accuracy: {accuracy:.2f}")
     print("Classification Report:")
     print(classification_report(y_cls_test, y_cls_pred))
+    
+    print("Confusion Matrix:")
+    print(confusion_matrix(y_cls_test, y_cls_pred))
 
 if __name__ == "__main__":
     evaluate_models()

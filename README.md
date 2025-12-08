@@ -29,29 +29,37 @@ The data is split into **Train (80%)** and **Test (20%)** sets to ensure we eval
 **Script:** `src/evaluate.py`
 
 ### Linear Regression (Total Score)
-- **Mean Squared Error (MSE): 2.04**: On average, the squared difference between predicted and actual scores is low, indicating good precision.
-- **R² Score: 0.96**: The model explains **96%** of the variance in the student scores. This is a very high score, suggesting that study hours and attendance are strong predictors of performance.
+- **Mean Squared Error (MSE): 80.94**: The average squared difference between predicted and actual scores is around 81, which means the model's predictions are off by about $\sqrt{81} \approx 9$ points on average.
+- **R² Score: 0.66**: The model explains **66%** of the variance in the student scores. This indicates a moderate fit; while study hours and attendance are important, other factors likely influence the score.
 
 ### Logistic Regression (Grade)
 - **Accuracy: 0.70**: The model correctly predicts the exact letter grade 70% of the time.
-- **Accuracy: 0.70**: The model correctly predicts the exact letter grade 70% of the time.
 
 ### Detailed Analysis (F1 Score & Confusion Matrix)
-The **Classification Report** reveals a critical insight that Accuracy hides:
+The **Confusion Matrix** and **Classification Report** reveal critical insights that Accuracy hides:
 
-1.  **Class 0 (Grade A)**: **F1 Score ~0.85**.
-    - The model is excellent at identifying top students. This is expected because the dataset is dominated by high-performing students (109k examples).
-2.  **Middle Classes (Grades B, C, D)**: **F1 Score ~0.50**.
-    - The model struggles to distinguish between these grades, likely confusing them with neighbors (e.g., predicting a 'C' as a 'B').
-3.  **Class 4 (Grade F)**: **F1 Score 0.00**.
-    - **CRITICAL FAILURE**: The model completely fails to identify failing students.
-    - **Reason**: There are only ~1,200 failing students vs ~110,000 'A' students. The model has learned to ignore this minority class to maximize overall accuracy.
+**Confusion Matrix:**
+```
+[[97143 12162   581     2     0]  <- True Class 0 (A)
+ [18503 26293  6553   207     0]  <- True Class 1 (B)
+ [ 1720 11705 12833  2122     0]  <- True Class 2 (C)
+ [   23   969  4803  3132     0]  <- True Class 3 (D)
+ [    0    17   402   830     0]] <- True Class 4 (F)
+```
+
+1.  **Class 0 (Grade A)**: **F1 Score 0.85**.
+    - The model performs well here, correctly identifying 97,143 out of 109,888 'A' students.
+    - **Implication**: The dataset is heavily imbalanced with 'A' students being the majority, so the model is biased towards predicting 'A'.
+2.  **Class 4 (Grade F)**: **F1 Score 0.00**.
+    - **CRITICAL FAILURE**: The model fails to correctly classify *any* of the failing students (0 true positives).
+    - It confuses them with Class 3 (830 times) and Class 2 (402 times).
+    - **Reason**: With only ~1,200 failing students vs ~110,000 'A' students, the model ignores this minority class to maximize overall accuracy.
 
 ### Conclusion on Model Performance
-- **Is this model good?** It depends on the goal.
-    - If the goal is to **predict top performers**, it is **Good**.
-    - If the goal is to **identify students at risk of failing** (Early Warning System), it is **USELESS** despite 70% accuracy.
-- **Fix**: To fix this, we would need to use techniques like **Oversampling (SMOTE)** or **Class Weights** to force the model to pay attention to the failing students.
+- **Is this model good?**
+    - For predicting **top performers**, it is decent.
+    - For an **Early Warning System** (identifying at-risk students), it is **completely ineffective**.
+- **Fix**: To address this, techniques like **Oversampling (SMOTE)**, **Class Weights**, or collecting more data for lower grades are necessary.
 
 ## 5. Serving Layer (Deployment)
 **Script:** `app/main.py`
