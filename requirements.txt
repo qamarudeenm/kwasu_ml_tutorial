@@ -6,3 +6,6 @@ uvicorn
 joblib
 requests
 httpx
+tensorflow
+matplotlib
+notebook

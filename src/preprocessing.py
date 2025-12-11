@@ -38,6 +38,7 @@ if __name__ == "__main__":
         exit(1)
         
     df = load_data('dataset/student_performance.csv')
+    print(df)
     df = preprocess_data(df)
     print("Data preprocessing complete.")
     print(df.head())
