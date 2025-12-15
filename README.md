@@ -11,6 +11,12 @@ git clone https://github.com/qamarudeenm/kwasu_ml_tutorial
 cd kwasu_ml_tutorial
 ```
 
+### Create a Branch
+**Important:** Before starting any work, you **must** create a new branch. Do not work directly on the `main` branch.
+```bash
+git checkout -b <your-name-task-name>
+```
+
 ## 2. Environment Setup
 
 ### 2.1 Create a Virtual Environment
