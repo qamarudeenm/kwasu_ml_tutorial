@@ -2,21 +2,87 @@
 
 This project implements an end-to-end Machine Learning pipeline to predict student performance based on study habits and attendance. It includes data preprocessing, feature engineering, model training, evaluation, and a REST API for serving predictions.
 
-## 1. Data Preprocessing
+## 1. Getting Started
+
+### Clone the Repository
+To get started with this project, clone the repository to your local machine:
+```bash
+git clone https://github.com/qamarudeenm/kwasu_ml_tutorial
+cd kwasu_ml_tutorial
+```
+
+## 2. Environment Setup
+
+### 2.1 Create a Virtual Environment
+It is recommended to use a virtual environment to manage dependencies.
+
+**For Windows:**
+```bash
+python -m venv venv
+```
+
+**For macOS and Linux:**
+```bash
+python3 -m venv venv
+```
+
+### 2.2 Activate the Virtual Environment
+
+**For Windows:**
+```bash
+venv\Scripts\activate
+```
+
+**For macOS and Linux:**
+```bash
+source venv/bin/activate
+```
+
+### 2.3 Install Dependencies
+Once the virtual environment is active, install the required packages:
+```bash
+pip install -r requirements.txt
+```
+
+## 3. Running the Project
+
+### Jupyter Notebooks
+This project contains several notebooks for learning and experimentation. Ensure your virtual environment is active before running Jupyter.
+
+**CNN Model:**
+To explore the Convolutional Neural Network model:
+```bash
+jupyter notebook Cnn_Model.ipynb
+```
+
+**Preprocessing Lecture:**
+To learn about data preprocessing and feature engineering:
+```bash
+jupyter notebook src/preprocessing_feature_engineering/preprocessing_step.ipynb
+```
+
+**Homework:**
+To work on the assignments:
+```bash
+cd home_work
+jupyter notebook
+```
+
+## 4. Data Preprocessing
 **Script:** `src/preprocessing.py`
 
 The raw data (`student_performance.csv`) contains student records.
 - **Missing Values**: Numerical columns are filled with the **mean**, and categorical columns with the **mode**.
 - **Categorical Encoding**: The `grade` target variable is encoded into numerical labels (0, 1, 2, 3, 4) using `LabelEncoder`. This encoder is saved to `models/label_encoder.pkl` to decode predictions later.
 
-## 2. Feature Engineering
+## 5. Feature Engineering
 **Script:** `src/features.py`
 
 To ensure models perform optimally, features are scaled.
 - **Scaling**: We use `StandardScaler` to normalize numerical features (`weekly_self_study_hours`, `attendance_percentage`, `class_participation`). This ensures that features with larger ranges don't dominate the model.
 - The scaler is saved to `models/scaler.pkl` to transform new data during inference.
 
-## 3. Model Training
+## 6. Model Training
 **Script:** `src/train.py`
 
 We train two separate models for different prediction tasks:
@@ -25,7 +91,7 @@ We train two separate models for different prediction tasks:
 
 The data is split into **Train (80%)** and **Test (20%)** sets to ensure we evaluate on unseen data.
 
-## 4. Model Evaluation & Interpretation
+## 7. Model Evaluation & Interpretation
 **Script:** `src/evaluate.py`
 
 ### Linear Regression (Total Score)
@@ -61,7 +127,7 @@ The **Confusion Matrix** and **Classification Report** reveal critical insights 
     - For an **Early Warning System** (identifying at-risk students), it is **completely ineffective**.
 - **Fix**: To address this, techniques like **Oversampling (SMOTE)**, **Class Weights**, or collecting more data for lower grades are necessary.
 
-## 5. Serving Layer (Deployment)
+## 8. Serving Layer (Deployment)
 **Script:** `app/main.py`
 
 The models are deployed using **FastAPI**, providing a high-performance, easy-to-use API.
